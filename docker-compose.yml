@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: blackgym
+      POSTGRES_PASSWORD: blackgym
+      POSTGRES_DB: blackgym
+    volumes:
+      - blackgym_pg:/var/lib/postgresql/data
+
+volumes:
+  blackgym_pg:
