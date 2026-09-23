@@ -104,7 +104,7 @@ blacksport/
 ├── README.md                 ← این سند (هماهنگی تیم‌ها)
 ├── task.md                   ← بریف کامل محصول
 ├── package.json
-├── docker-compose.yml        ← اختیاری (Postgres قدیمی؛ پروژه روی MySQL/MAMP است)
+├── docker-compose.yml        ← Postgres لوکال (اختیاری)
 ├── .env.example
 ├── prisma/
 │   ├── schema.prisma         ← مدل داده کامل
@@ -218,7 +218,7 @@ blacksport/
 |------|----------|
 | Frontend/Full-stack | Next.js 16 App Router + TypeScript |
 | UI | Tailwind 4 + کامپوننت‌های shadcn-style + Motion |
-| DB | MySQL (MAMP پورت `8889`) + Prisma |
+| DB | PostgreSQL (لوکال Docker / Prisma Postgres روی Vercel) + Prisma |
 | Auth | Auth.js (NextAuth v5) + RBAC |
 | Validation | Zod |
 | Payment | Strategy: Mock / Zibal / IDPay |
@@ -230,9 +230,8 @@ blacksport/
 ```bash
 npm install
 
-# MAMP → MySQL روشن، دیتابیس ساخته شده
-# نمونه فعلی:
-# DATABASE_URL="mysql://root:root@127.0.0.1:8889/fdssskdksdk"
+# لوکال: docker compose up -d  (Postgres روی 5432)
+# یا DATABASE_URL پروداکشن Prisma Postgres را بگذارید
 
 cp .env.example .env
 npm run db:push
@@ -250,9 +249,9 @@ npm run dev
 راهنمای کامل: [`docs/deploy-vercel.md`](docs/deploy-vercel.md)
 
 خلاصه:
-1. یک MySQL ریموت بسازید و `npx prisma db push` بزنید  
+1. Postgres ریموت (Prisma/Vercel) + `DATABASE_URL` + `npx prisma db push`  
 2. ریپو را به Vercel وصل کنید  
-3. Envها را ست کنید: `DATABASE_URL`, `AUTH_SECRET`, `AUTH_URL`, `NEXT_PUBLIC_APP_URL`, `CRON_SECRET`
+3. Envها: `DATABASE_URL`, `AUTH_SECRET`, `AUTH_URL`, `NEXT_PUBLIC_APP_URL`, `PAYMENT_*`, `UPLOAD_PROVIDER`, `CRON_SECRET`
 
 ### اسکریپت‌ها
 

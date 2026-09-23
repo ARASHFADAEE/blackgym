@@ -2,7 +2,7 @@ import { PrismaClient } from "@prisma/client";
 
 /**
  * Reuse a single PrismaClient across hot serverless invocations on Vercel.
- * Prevents exhausting MySQL connection pools under traffic spikes.
+ * Prevents exhausting PostgreSQL connection pools under traffic spikes.
  */
 const globalForPrisma = globalThis as unknown as { prisma: PrismaClient | undefined };
 
