@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useActionState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,20 +11,23 @@ import { Label } from "@/components/ui/label";
 import { loginAction, type ActionResult } from "@/features/auth/actions";
 
 export function LoginForm() {
-  const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl") ?? "";
   const [state, formAction, pending] = useActionState<ActionResult | null, FormData>(
     loginAction,
     null,
   );
 
   useEffect(() => {
-    if (state?.success && state.redirectTo) {
-      router.push(state.redirectTo);
+    if (state?.error) {
+      toast.error(state.error);
     }
-  }, [state, router]);
+  }, [state]);
 
   return (
     <form action={formAction} className="space-y-5">
+      {callbackUrl ? <input type="hidden" name="callbackUrl" value={callbackUrl} /> : null}
+
       {state?.error ? (
         <p className="rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
           {state.error}

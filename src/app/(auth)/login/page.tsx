@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Suspense } from "react";
 
 import {
   AuthCardBody,
@@ -20,7 +21,9 @@ export default function LoginPage() {
         description="برای دسترسی به پنل ورزشکار یا مربی وارد شوید."
       />
       <AuthCardBody>
-        <LoginForm />
+        <Suspense fallback={<p className="text-sm text-muted-foreground">در حال بارگذاری…</p>}>
+          <LoginForm />
+        </Suspense>
         <p className="mt-6 text-center text-sm text-muted-foreground">
           حساب ندارید؟{" "}
           <Link href="/register" className="text-foreground hover:underline">

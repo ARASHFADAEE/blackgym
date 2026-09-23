@@ -4,11 +4,25 @@ import { getToken } from "next-auth/jwt";
 
 const AUTH_PATHS = ["/login", "/register", "/forgot-password", "/reset-password"];
 
+/**
+ * Auth.js sets `__Secure-authjs.session-token` on HTTPS (Vercel).
+ * getToken defaults secureCookie to false unless passed — must match or JWT is invisible.
+ */
+function resolveSecureCookie(request: NextRequest): boolean {
+  return (
+    request.nextUrl.protocol === "https:" ||
+    process.env.VERCEL === "1" ||
+    process.env.AUTH_URL?.startsWith("https://") === true
+  );
+}
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  const secureCookie = resolveSecureCookie(request);
   const token = await getToken({
     req: request,
     secret: process.env.AUTH_SECRET,
+    secureCookie,
   });
 
   const isAuthPage = AUTH_PATHS.some((p) => pathname.startsWith(p));
@@ -37,7 +51,6 @@ export async function middleware(request: NextRequest) {
   if (token) {
     const role = token.role as string;
     if (isAthlete && role !== "ATHLETE" && role !== "SUPER_ADMIN") {
-      // allow admins to peek? no — redirect to their dashboard
       if (role === "TRAINER") return NextResponse.redirect(new URL("/trainer", request.url));
       if (["SUPER_ADMIN", "ADMIN", "BRANCH_MANAGER", "STAFF"].includes(role)) {
         return NextResponse.redirect(new URL("/admin", request.url));
@@ -59,5 +72,13 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/athlete/:path*", "/trainer/:path*", "/admin/:path*", "/login", "/register", "/forgot-password", "/reset-password"],
+  matcher: [
+    "/athlete/:path*",
+    "/trainer/:path*",
+    "/admin/:path*",
+    "/login",
+    "/register",
+    "/forgot-password",
+    "/reset-password",
+  ],
 };

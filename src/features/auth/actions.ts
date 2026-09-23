@@ -3,6 +3,7 @@
 import bcrypt from "bcryptjs";
 import { randomBytes } from "crypto";
 import { AuthError } from "next-auth";
+import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { prisma } from "@/lib/db/prisma";
 import { signIn, signOut } from "@/lib/auth";
 import { loginSchema, registerSchema } from "@/lib/validations/auth";
@@ -15,6 +16,15 @@ export type ActionResult = {
   error?: string;
   redirectTo?: string;
 };
+
+/** Only allow same-origin relative paths (block open redirects). */
+function safeCallbackPath(raw: FormDataEntryValue | null): string | null {
+  const value = String(raw ?? "").trim();
+  if (!value.startsWith("/") || value.startsWith("//") || value.includes("://")) {
+    return null;
+  }
+  return value;
+}
 
 export async function loginAction(_prev: ActionResult | null, formData: FormData): Promise<ActionResult> {
   const parsed = loginSchema.safeParse({
@@ -32,22 +42,25 @@ export async function loginAction(_prev: ActionResult | null, formData: FormData
       password: parsed.data.password,
       redirect: false,
     });
-
-    const user = await prisma.user.findUnique({
-      where: { email: parsed.data.email.toLowerCase() },
-      select: { role: true },
-    });
-
-    return {
-      success: true,
-      redirectTo: user ? getDashboardPath(user.role) : "/athlete",
-    };
   } catch (error) {
+    if (isRedirectError(error)) throw error;
     if (error instanceof AuthError) {
       return { success: false, error: "ایمیل یا رمز عبور اشتباه است" };
     }
     throw error;
   }
+
+  const user = await prisma.user.findUnique({
+    where: { email: parsed.data.email.toLowerCase() },
+    select: { role: true },
+  });
+
+  const callback = safeCallbackPath(formData.get("callbackUrl"));
+  const dest = callback ?? (user ? getDashboardPath(user.role) : "/athlete");
+
+  // Server redirect after cookie is set — more reliable than client router.push on Vercel
+  redirect(dest);
+  return { success: true, redirectTo: dest };
 }
 
 export async function registerAction(_prev: ActionResult | null, formData: FormData): Promise<ActionResult> {
