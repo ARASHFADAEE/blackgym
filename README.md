@@ -243,6 +243,17 @@ npm run dev
 آدرس: [http://localhost:3000](http://localhost:3000)  
 پنل ادمین: [http://localhost:3000/admin](http://localhost:3000/admin)
 
+### دپلوی روی Vercel
+
+پروژه برای Vercel آماده است (`vercel.json` + `postinstall`/`build` با Prisma).
+
+راهنمای کامل: [`docs/deploy-vercel.md`](docs/deploy-vercel.md)
+
+خلاصه:
+1. یک MySQL ریموت بسازید و `npx prisma db push` بزنید  
+2. ریپو را به Vercel وصل کنید  
+3. Envها را ست کنید: `DATABASE_URL`, `AUTH_SECRET`, `AUTH_URL`, `NEXT_PUBLIC_APP_URL`, `CRON_SECRET`
+
 ### اسکریپت‌ها
 
 ```bash
@@ -277,6 +288,7 @@ SMS/Push · دستیار AI گفت‌وگویی · اپ موبایل · Multi-te
 
 - [`docs/architecture.md`](docs/architecture.md) — لایه‌ها و جریان سیستم  
 - [`docs/database.md`](docs/database.md) — ER و قیدها  
+- [`docs/deploy-vercel.md`](docs/deploy-vercel.md) — دپلوی روی Vercel  
 - [`docs/coverage-about.md`](docs/coverage-about.md) — پوشش نسبت به پروپوزال `about.html`  
 - [`task.md`](task.md) — بریف کامل محصول
 
