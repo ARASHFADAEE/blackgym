@@ -10,7 +10,7 @@ Browser
   → Server Actions / Route Handlers
   → Feature Services
   → Prisma Repositories
-  → MySQL
+  → PostgreSQL
 ```
 
 ## Route groups
